@@ -9,17 +9,10 @@ public class BotConfig {
     private final String name;
     private final String token;
 
-    {
-        Properties prop = new Properties();
-        try (InputStream input = new FileInputStream("src/main/resources/config.properties")) {
-            prop.load(input);
-            this.name = prop.getProperty("bot_name");
-            this.token = prop.getProperty("token");
-        }
-        catch (IOException e) {
-            throw new RuntimeException(e);
-        }
-
+    public BotConfig() {
+        Properties prop = loadProperties();
+        this.name = prop.getProperty("bot_name");
+        this.token = prop.getProperty("token");
     }
 
     public String getName() {
@@ -28,5 +21,16 @@ public class BotConfig {
 
     public String getToken() {
         return token;
+    }
+
+    private Properties loadProperties() {
+        Properties prop = new Properties();
+        try (InputStream input = BotConfig.class.getClassLoader()
+                .getResourceAsStream("config.properties")) {
+            prop.load(input);
+            return prop;
+        } catch (IOException e) {
+            throw new IllegalStateException("Failed to load configuration", e);
+        }
     }
 }
